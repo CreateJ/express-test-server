@@ -1,13 +1,22 @@
-// 导入express
-let express = require('express')
+let {app} = require('./app')
+let {User} = require('./db')
 
-// 创建web服务器
-let app = express()
 
-app.listen('3000', () => {
-  console.log('server start!')
-})
-
-app.get('/list', (req, res) => {
-  res.send({text: 'Hello World!'})
+app.post('/list', (req, res) => {
+  console.log('get list')
+  console.log(req.body)
+  const {pageNo = 1, pageSize = 10} = req.body
+  User.find().skip(((pageNo - 1) * pageSize)).limit(pageSize).then(r => {
+    User.find().then(totalRes => {
+      res.send({
+        code: "0",
+        data: {
+          list: r,
+          total: totalRes.length,
+          pageSize,
+          pageNo
+        }
+      })
+    })
+  })
 })
